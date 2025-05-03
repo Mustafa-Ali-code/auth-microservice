@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-microservice
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: auth-microservice
+  template:
+    metadata:
+      labels:
+        app: auth-microservice
+    spec:
+      containers:
+        - name: auth-microservice
+          image: auth-microservice:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+              name: http
+          env:
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: JWT_SECRET
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "200m"
+              memory: "256Mi"
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-microservice-service
+  labels:
+    app: auth-microservice
+spec:
+  type: LoadBalancer
+  selector:
+    app: auth-microservice
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: http

@@ -1,0 +1,61 @@
+config:
+  target: "http://localhost:4000"
+  phases:
+    - duration: 60  # 1 minute warm-up
+      arrivalRate: 5
+      name: "Warm up traffic"
+    - duration: 120  # 2 minutes heavy load
+      arrivalRate: 1000
+      rampTo: 2000
+      name: "Increasing heavy load"
+    - duration: 60  # 1 minute cool down
+      arrivalRate: 10
+      name: "Cool down"
+
+  payload:
+    path: "users.csv"
+    fields:
+      - email
+      - password
+
+scenarios:
+  - name: "User Sign Up"
+    weight: 30
+    flow:
+      - post:
+          url: "/register"
+          json:
+            email: "{{ email }}"
+            password: "{{ password }}"
+            role: "user"
+  - name: "User Login"
+    weight: 50
+    flow:
+      - post:
+          url: "/login"
+          json:
+            email: "{{ email }}"
+            password: "{{ password }}"
+  - name: "Access Protected Resource"
+    weight: 15
+    flow:
+      - get:
+          url: "/protected"
+          headers:
+            Authorization: "Bearer {{ $login.accessToken }}"
+  - name: "Admin Access Attempt"
+    weight: 5
+    flow:
+      - get:
+          url: "/admin"
+          headers:
+            Authorization: "Bearer {{ $login.accessToken }}"
+
+processors:
+  login:
+    function: |
+      function (userContext, events, done) {
+        const token = userContext.vars.accessToken;
+        userContext.vars.Authorization = `Bearer ${token}`;
+        return done();
+      }

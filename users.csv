@@ -1,0 +1,5 @@
+email,password
+user1@example.com,Password123!
+user2@example.com,Password123!
+admin@example.com,AdminPass123!
+fakeuser@example.com,WrongPassword!
