@@ -132,4 +132,4 @@ MIT License
 ---
 
 ## 🙌 Acknowledgements
-Built as part of an Independent Study project at Sewanee (Spring 2025), under the guidance of Prof. X.
+Built as part of an Independent Study project at Sewanee (Spring 2025), under the guidance of Prof. Carl.
